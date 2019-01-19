@@ -1,11 +1,33 @@
 import React from 'react'
 
+const today = new Date()
+let dd = today.getDate()
+let mm = today.getMonth() + 1 //January is 0!
+let yyyy = today.getFullYear()
+
+if (dd < 10) {
+  dd = '0' + dd
+}
+
+if (mm < 10) {
+  mm = '0' + mm
+}
+
+const formattedDate = mm + '/' + dd + '/' + yyyy
+
 class BigPicture extends React.Component {
   constructor() {
     super()
     this.state = {}
   }
   render() {
+    const blob = new Blob(
+      [this.props.committed.join(' ')], // Blob parts.
+      {
+        type: 'text/plain;charset=utf-8',
+      }
+    )
+    const downloadUrl = URL.createObjectURL(blob)
     return (
       <div
         onMouseEnter={() => {
@@ -23,30 +45,34 @@ class BigPicture extends React.Component {
           top: 0,
           fontSize: '7px',
           lineHeight: '11px',
-          transition: 'opacity 300ms',
-          opacity: this.state.active ? 0.8 : 0.5,
+          opacity: 0.8,
           cursor: 'pointer',
         }}
       >
-        <p>{this.props.committed.join(' ')}</p>
-        <button
-          onClick={this.props.clearCommitted}
+        <p style={{ margin: 0 }}>{this.props.committed.join(' ')}</p>
+        <a
+          download={`tfw-ow-${formattedDate}.txt`}
+          href={downloadUrl}
           style={{
-            height: '30px',
-            width: '30px',
             position: 'absolute',
-            right: '20px',
-            bottom: '20px',
-            fontSize: '7px',
-            lineHeight: '11px',
+            left: '0',
+            textAlign: 'center',
+            lineHeight: '100%',
+            fontSize: '18px',
+            right: '0',
+            top: 0,
+            bottom: 0,
+            color: 'black',
+            textDecoration: 'none',
             transition: 'opacity 300ms',
-            opacity: this.state.active ? 1 : 0,
+            backgroundColor: 'white',
+            opacity: this.state.active ? 0.8 : 0,
             pointerEvents: this.state.active ? 'auto' : 'none',
             cursor: 'pointer',
           }}
         >
-          {`X`}
-        </button>
+          {`Download`}
+        </a>
       </div>
     )
   }
@@ -77,8 +103,8 @@ class OneWay extends React.Component {
           position: 'absolute',
           left: '30px',
           right: '30px',
-          top: '80px',
-          bottom: '80px',
+          top: '30px',
+          bottom: '30px',
           flexDirection: 'row',
           alignItems: 'center',
         }}

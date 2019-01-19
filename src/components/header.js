@@ -12,7 +12,7 @@ const Header = ({ siteTitle }) => (
   >
     <div
       style={{
-        padding: `1rem`,
+        paddingLeft: `10px`,
         fontFamily: 'Courier New',
       }}
     >
