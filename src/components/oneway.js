@@ -45,7 +45,7 @@ class BigPicture extends React.Component {
             cursor: 'pointer',
           }}
         >
-          {`-->`}
+          {`X`}
         </button>
       </div>
     )
@@ -77,8 +77,8 @@ class OneWay extends React.Component {
           position: 'absolute',
           left: '30px',
           right: '30px',
-          top: '30px',
-          bottom: '30px',
+          top: '80px',
+          bottom: '80px',
           flexDirection: 'row',
           alignItems: 'center',
         }}
