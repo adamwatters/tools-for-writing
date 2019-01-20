@@ -52,10 +52,33 @@ class BigPicture extends React.Component {
         <p style={{ margin: 0 }}>{this.props.committed.join(' ')}</p>
         <a
           download={`tfw-ow-${formattedDate}.txt`}
-          href={downloadUrl}
+          onClick={this.props.clearCommitted}
           style={{
             position: 'absolute',
             left: '0',
+            textAlign: 'center',
+            lineHeight: '100%',
+            fontSize: '18px',
+            right: '50%',
+            top: 0,
+            bottom: 0,
+            color: 'black',
+            textDecoration: 'none',
+            transition: 'opacity 300ms',
+            backgroundColor: 'white',
+            opacity: this.state.active ? 0.8 : 0,
+            pointerEvents: this.state.active ? 'auto' : 'none',
+            cursor: 'pointer',
+          }}
+        >
+          {`Clear`}
+        </a>
+        <a
+          download={`tfw-ow-${formattedDate}.txt`}
+          href={downloadUrl}
+          style={{
+            position: 'absolute',
+            left: '50%',
             textAlign: 'center',
             lineHeight: '100%',
             fontSize: '18px',
