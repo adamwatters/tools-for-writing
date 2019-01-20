@@ -36,7 +36,7 @@ class Timer extends React.Component {
       this.setState({
         clock: this.state.clock + 1,
       })
-    }, 1000)
+    }, 60000)
   }
   render() {
     let distributableTime = this.state.clock
