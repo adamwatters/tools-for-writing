@@ -153,17 +153,23 @@ class BigPicture extends React.Component {
     this.state = {}
   }
   render() {
-    const blob = new Blob(
-      [this.props.committed.join(' ')], // Blob parts.
-      {
-        type: 'text/plain;charset=utf-8',
-      }
-    )
-    const downloadUrl = URL.createObjectURL(blob)
+    let downloadUrl
+    const committed = this.props.committed || []
+    if (typeof Blob !== `undefined`) {
+      const blob = new Blob(
+        [committed.join(' ')], // Blob parts.
+        {
+          type: 'text/plain;charset=utf-8',
+        }
+      )
+      downloadUrl = URL.createObjectURL(blob)
+    } else {
+      downloadUrl = ''
+    }
     return (
       <div
         onMouseEnter={() => {
-          if (this.props.committed.length) {
+          if (committed.length) {
             this.setState({ active: true })
           }
         }}
@@ -181,7 +187,7 @@ class BigPicture extends React.Component {
           cursor: 'pointer',
         }}
       >
-        <p style={{ margin: 0 }}>{this.props.committed.join(' ')}</p>
+        <p style={{ margin: 0 }}>{committed.join(' ')}</p>
         <div
           download={`tfw-ow-${formattedDate}.txt`}
           onClick={this.props.clearCommitted}
@@ -238,7 +244,10 @@ class BigPicture extends React.Component {
 class OneWay extends React.Component {
   constructor() {
     super()
-    const persistedStateString = localStorage.getItem('oneway.state')
+    const persistedStateString =
+      typeof window !== `undefined`
+        ? window.localStorage.getItem('oneway.state')
+        : '{}'
     this.state = persistedStateString
       ? JSON.parse(persistedStateString)
       : {
@@ -248,7 +257,9 @@ class OneWay extends React.Component {
   }
 
   componentDidUpdate() {
-    localStorage.setItem('oneway.state', JSON.stringify(this.state))
+    if (typeof window !== `undefined`) {
+      window.localStorage.setItem('oneway.state', JSON.stringify(this.state))
+    }
   }
 
   render() {
