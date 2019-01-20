@@ -15,6 +15,136 @@ if (mm < 10) {
 
 const formattedDate = mm + '/' + dd + '/' + yyyy
 
+class Timer extends React.Component {
+  constructor() {
+    super()
+    this.config = [
+      { segmentType: 'work', segmentLength: 20 },
+      { segmentType: 'break', segmentLength: 5 },
+      { segmentType: 'work', segmentLength: 20 },
+      { segmentType: 'break', segmentLength: 5 },
+      { segmentType: 'work', segmentLength: 20 },
+      { segmentType: 'break', segmentLength: 5 },
+      { segmentType: 'work', segmentLength: 20 },
+    ]
+    this.state = {
+      clock: 1,
+    }
+  }
+  componentDidMount() {
+    setInterval(() => {
+      this.setState({
+        clock: this.state.clock + 1,
+      })
+    }, 60000)
+  }
+  render() {
+    let distributableTime = this.state.clock
+    const segments = []
+    let isBreak = false
+    this.config.forEach(s => {
+      if (distributableTime === 0) {
+        segments.push({
+          segmentType: s.segmentType,
+          segmentLength: s.segmentLength,
+          remaining: s.segmentLength,
+          status: 'future',
+        })
+      } else if (distributableTime <= s.segmentLength) {
+        if (s.segmentType === 'break') {
+          isBreak = true
+        }
+        segments.push({
+          segmentType: s.segmentType,
+          segmentLength: s.segmentLength,
+          remaining: s.segmentLength - distributableTime,
+          status: 'active',
+        })
+        distributableTime = 0
+      } else if (distributableTime > s.segmentLength) {
+        segments.push({
+          segmentType: s.segmentType,
+          segmentLength: s.segmentLength,
+          remaining: s.segmentLength - distributableTime,
+          status: 'complete',
+        })
+        distributableTime = distributableTime - s.segmentLength
+      }
+    })
+    return (
+      <div>
+        {isBreak && (
+          <div
+            style={{
+              position: 'absolute',
+              left: 0,
+              bottom: 0,
+              top: 0,
+              right: 0,
+              display: 'flex',
+              flexDirection: 'row',
+              alignContent: 'center',
+              alignItems: 'center',
+              color: 'white',
+              backgroundColor: 'black',
+              opacity: 0.8,
+            }}
+          >
+            <div style={{ textAlign: 'center', width: '100%' }}>
+              Take a Break
+            </div>
+          </div>
+        )}
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            bottom: 0,
+            display: 'flex',
+            flexDirection: 'row',
+            opacity: 0.8,
+          }}
+        >
+          {segments.map((s, i) => {
+            if (s.status === 'complete') {
+              return (
+                <div
+                  key={i}
+                  style={{
+                    width: '24px',
+                    height: '24px',
+                    backgroundColor: 'black',
+                    opacity: 0.8,
+                    borderRadius: '50%',
+                    margin: '1px',
+                  }}
+                />
+              )
+            }
+            return (
+              <div
+                key={i}
+                style={{
+                  width: '24px',
+                  height: '24px',
+                  lineHeight: '24px',
+                  fontSize: '14px',
+                  textAlign: 'center',
+                  transition: 'opacity 300ms',
+                  opacity: s.status === 'active' ? 1 : 0.3,
+                  margin: '1px',
+                }}
+              >
+                {`${s.status === 'active' ? s.remaining + 1 : s.segmentLength}`}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
+}
+
 class BigPicture extends React.Component {
   constructor() {
     super()
@@ -39,7 +169,7 @@ class BigPicture extends React.Component {
           this.setState({ active: false })
         }}
         style={{
-          width: `240px`,
+          width: `280px`,
           position: 'absolute',
           right: 0,
           top: 0,
@@ -50,7 +180,7 @@ class BigPicture extends React.Component {
         }}
       >
         <p style={{ margin: 0 }}>{this.props.committed.join(' ')}</p>
-        <a
+        <div
           download={`tfw-ow-${formattedDate}.txt`}
           onClick={this.props.clearCommitted}
           style={{
@@ -72,7 +202,7 @@ class BigPicture extends React.Component {
           }}
         >
           {`Clear`}
-        </a>
+        </div>
         <a
           download={`tfw-ow-${formattedDate}.txt`}
           href={downloadUrl}
@@ -167,6 +297,7 @@ class OneWay extends React.Component {
             }}
           />
         </div>
+        <Timer />
       </div>
     )
   }
