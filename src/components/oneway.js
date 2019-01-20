@@ -36,12 +36,12 @@ class Timer extends React.Component {
       this.setState({
         clock: this.state.clock + 1,
       })
-    }, 60000)
+    }, 1000)
   }
   render() {
     let distributableTime = this.state.clock
     const segments = []
-    let isBreak = false
+    let breakTimeRemaining = null
     this.config.forEach(s => {
       if (distributableTime === 0) {
         segments.push({
@@ -52,7 +52,7 @@ class Timer extends React.Component {
         })
       } else if (distributableTime <= s.segmentLength) {
         if (s.segmentType === 'break') {
-          isBreak = true
+          breakTimeRemaining = s.segmentLength - distributableTime
         }
         segments.push({
           segmentType: s.segmentType,
@@ -73,7 +73,7 @@ class Timer extends React.Component {
     })
     return (
       <div>
-        {isBreak && (
+        {!!breakTimeRemaining && (
           <div
             style={{
               position: 'absolute',
@@ -91,7 +91,9 @@ class Timer extends React.Component {
             }}
           >
             <div style={{ textAlign: 'center', width: '100%' }}>
-              Take a Break
+              {`Break Time - ${breakTimeRemaining}  minute${
+                breakTimeRemaining === 1 ? '' : 's'
+              } remaining`}
             </div>
           </div>
         )}
@@ -173,8 +175,8 @@ class BigPicture extends React.Component {
           position: 'absolute',
           right: 0,
           top: 0,
-          fontSize: '7px',
-          lineHeight: '11px',
+          fontSize: '6px',
+          lineHeight: '10px',
           opacity: 0.8,
           cursor: 'pointer',
         }}
@@ -186,8 +188,9 @@ class BigPicture extends React.Component {
           style={{
             position: 'absolute',
             left: '0',
-            textAlign: 'center',
-            lineHeight: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
             fontSize: '18px',
             right: '50%',
             top: 0,
@@ -201,7 +204,7 @@ class BigPicture extends React.Component {
             cursor: 'pointer',
           }}
         >
-          {`Clear`}
+          <span>{`Clear`}</span>
         </div>
         <a
           download={`tfw-ow-${formattedDate}.txt`}
@@ -209,8 +212,9 @@ class BigPicture extends React.Component {
           style={{
             position: 'absolute',
             left: '50%',
-            textAlign: 'center',
-            lineHeight: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
             fontSize: '18px',
             right: '0',
             top: 0,
@@ -224,7 +228,7 @@ class BigPicture extends React.Component {
             cursor: 'pointer',
           }}
         >
-          {`Download`}
+          <span>{`Download`}</span>
         </a>
       </div>
     )
