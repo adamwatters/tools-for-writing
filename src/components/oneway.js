@@ -1,4 +1,5 @@
 import React from 'react'
+import Pomodoro from '../components/pomodoro.js'
 
 const today = new Date()
 let dd = today.getDate()
@@ -14,138 +15,6 @@ if (mm < 10) {
 }
 
 const formattedDate = mm + '/' + dd + '/' + yyyy
-
-class Timer extends React.Component {
-  constructor() {
-    super()
-    this.config = [
-      { segmentType: 'work', segmentLength: 20 },
-      { segmentType: 'break', segmentLength: 5 },
-      { segmentType: 'work', segmentLength: 20 },
-      { segmentType: 'break', segmentLength: 5 },
-      { segmentType: 'work', segmentLength: 20 },
-      { segmentType: 'break', segmentLength: 5 },
-      { segmentType: 'work', segmentLength: 20 },
-    ]
-    this.state = {
-      clock: 1,
-    }
-  }
-  componentDidMount() {
-    setInterval(() => {
-      this.setState({
-        clock: this.state.clock + 1,
-      })
-    }, 60000)
-  }
-  render() {
-    let distributableTime = this.state.clock
-    const segments = []
-    let breakTimeRemaining = null
-    this.config.forEach(s => {
-      if (distributableTime === 0) {
-        segments.push({
-          segmentType: s.segmentType,
-          segmentLength: s.segmentLength,
-          remaining: s.segmentLength,
-          status: 'future',
-        })
-      } else if (distributableTime <= s.segmentLength) {
-        if (s.segmentType === 'break') {
-          breakTimeRemaining = s.segmentLength - distributableTime
-        }
-        segments.push({
-          segmentType: s.segmentType,
-          segmentLength: s.segmentLength,
-          remaining: s.segmentLength - distributableTime,
-          status: 'active',
-        })
-        distributableTime = 0
-      } else if (distributableTime > s.segmentLength) {
-        segments.push({
-          segmentType: s.segmentType,
-          segmentLength: s.segmentLength,
-          remaining: s.segmentLength - distributableTime,
-          status: 'complete',
-        })
-        distributableTime = distributableTime - s.segmentLength
-      }
-    })
-    return (
-      <div>
-        {!!breakTimeRemaining && (
-          <div
-            style={{
-              position: 'absolute',
-              left: 0,
-              bottom: 0,
-              top: 0,
-              right: 0,
-              display: 'flex',
-              flexDirection: 'row',
-              alignContent: 'center',
-              alignItems: 'center',
-              color: 'white',
-              backgroundColor: 'black',
-              opacity: 0.8,
-            }}
-          >
-            <div style={{ textAlign: 'center', width: '100%' }}>
-              {`Break Time - ${breakTimeRemaining}  minute${
-                breakTimeRemaining === 1 ? '' : 's'
-              } remaining`}
-            </div>
-          </div>
-        )}
-        <div
-          style={{
-            position: 'absolute',
-            left: 0,
-            bottom: 0,
-            display: 'flex',
-            flexDirection: 'row',
-            opacity: 0.8,
-          }}
-        >
-          {segments.map((s, i) => {
-            if (s.status === 'complete') {
-              return (
-                <div
-                  key={i}
-                  style={{
-                    width: '24px',
-                    height: '24px',
-                    backgroundColor: 'black',
-                    opacity: 0.8,
-                    borderRadius: '50%',
-                    margin: '1px',
-                  }}
-                />
-              )
-            }
-            return (
-              <div
-                key={i}
-                style={{
-                  width: '24px',
-                  height: '24px',
-                  lineHeight: '24px',
-                  fontSize: '14px',
-                  textAlign: 'center',
-                  transition: 'opacity 300ms',
-                  opacity: s.status === 'active' ? 1 : 0.3,
-                  margin: '1px',
-                }}
-              >
-                {`${s.status === 'active' ? s.remaining + 1 : s.segmentLength}`}
-              </div>
-            )
-          })}
-        </div>
-      </div>
-    )
-  }
-}
 
 class BigPicture extends React.Component {
   constructor() {
@@ -196,7 +65,7 @@ class BigPicture extends React.Component {
             left: '0',
             display: 'flex',
             justifyContent: 'center',
-            alignItems: 'center',
+            alignItems: 'flex-start',
             fontSize: '18px',
             right: '50%',
             top: 0,
@@ -220,7 +89,7 @@ class BigPicture extends React.Component {
             left: '50%',
             display: 'flex',
             justifyContent: 'center',
-            alignItems: 'center',
+            alignItems: 'flex-start',
             fontSize: '18px',
             right: '0',
             top: 0,
@@ -265,55 +134,56 @@ class OneWay extends React.Component {
   render() {
     const { committed, inTheWorks } = this.state
     return (
-      <div
-        style={{
-          display: 'flex',
-          position: 'absolute',
-          left: '30px',
-          right: '30px',
-          top: '30px',
-          bottom: '30px',
-          flexDirection: 'row',
-          alignItems: 'center',
-        }}
-      >
-        <BigPicture
-          clearCommitted={() => {
-            this.setState({ committed: [] })
-          }}
-          committed={committed}
-        />
+      <Pomodoro>
         <div
           style={{
-            width: `80%`,
-            maxWidth: '500px',
-            position: 'center',
-            margin: '0 auto',
+            display: 'flex',
+            position: 'absolute',
+            left: '30px',
+            right: '30px',
+            top: '30px',
+            bottom: '30px',
+            flexDirection: 'row',
+            alignItems: 'center',
           }}
         >
-          <input
-            style={{
-              width: '100%',
-              padding: '8px',
-              outlineColor: 'lightgreen',
+          <BigPicture
+            clearCommitted={() => {
+              this.setState({ committed: [] })
             }}
-            type="text"
-            value={inTheWorks}
-            onChange={e => {
-              this.setState({ inTheWorks: e.target.value })
-            }}
-            onKeyDown={e => {
-              if (e.key === 'Enter') {
-                this.setState({
-                  committed: [...committed, inTheWorks],
-                  inTheWorks: '',
-                })
-              }
-            }}
+            committed={committed}
           />
+          <div
+            style={{
+              width: `80%`,
+              maxWidth: '500px',
+              position: 'center',
+              margin: '0 auto',
+            }}
+          >
+            <input
+              style={{
+                width: '100%',
+                padding: '8px',
+                outlineColor: 'lightgreen',
+              }}
+              type="text"
+              value={inTheWorks}
+              onChange={e => {
+                this.setState({ inTheWorks: e.target.value })
+              }}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  this.setState({
+                    committed: [...committed, inTheWorks],
+                    inTheWorks: '',
+                  })
+                }
+              }}
+            />
+          </div>
         </div>
-        <Timer />
-      </div>
+      </Pomodoro>
     )
   }
 }
