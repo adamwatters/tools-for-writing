@@ -29,7 +29,7 @@ class Pomodoro extends React.Component {
       this.setState({
         clock: this.state.clock + 1,
       })
-    }, 10)
+    }, 1000)
   }
 
   resetClock() {
