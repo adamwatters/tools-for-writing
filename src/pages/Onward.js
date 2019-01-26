@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Pomodoro from "../components/Pomodoro";
-import { mmddyyyy } from "../utilities/datetime";
+import { mmddyyyy } from "../utilities/datetime.ts";
 
 class BigPicture extends Component {
   constructor() {
