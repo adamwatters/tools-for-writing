@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Pomodoro from "../components/pomodoro";
+import Pomodoro from "../components/Pomodoro";
 import { mmddyyyy } from "../utilities/datetime";
 
 class BigPicture extends Component {
@@ -8,19 +8,14 @@ class BigPicture extends Component {
     this.state = {};
   }
   render() {
-    let downloadUrl;
     const committed = this.props.committed || [];
-    if (typeof Blob !== `undefined`) {
-      const blob = new Blob(
-        [committed.join(" ")], // Blob parts.
-        {
-          type: "text/plain;charset=utf-8"
-        }
-      );
-      downloadUrl = URL.createObjectURL(blob);
-    } else {
-      downloadUrl = "";
-    }
+    const blob = new Blob(
+      [committed.join(" ")], // Blob parts.
+      {
+        type: "text/plain;charset=utf-8"
+      }
+    );
+    const downloadUrl = URL.createObjectURL(blob);
     return (
       <div
         onMouseEnter={() => {
