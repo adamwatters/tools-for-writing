@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Pomodoro from "../components/Pomodoro";
+import Tomato from "../components/Tomato";
 import { mmddyyyy } from "../utilities/datetime.ts";
 
 class BigPicture extends Component {
@@ -115,7 +115,7 @@ class OneWay extends Component {
   render() {
     const { committed, inTheWorks } = this.state;
     return (
-      <Pomodoro>
+      <Tomato>
         <div
           style={{
             display: "flex",
@@ -164,7 +164,7 @@ class OneWay extends Component {
             />
           </div>
         </div>
-      </Pomodoro>
+      </Tomato>
     );
   }
 }
