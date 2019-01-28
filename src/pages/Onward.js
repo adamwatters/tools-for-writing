@@ -10,12 +10,38 @@ class BigPicture extends Component {
   render() {
     const committed = this.props.committed || [];
     const blob = new Blob(
-      [committed.join(" ")], // Blob parts.
+      [
+        [
+          `\n`,
+          ...committed.map(c => {
+            return c === "<NEWPARAGRAPH>" ? `\n\n` : c;
+          })
+        ].join(" ")
+      ], // Blob parts.
       {
         type: "text/plain;charset=utf-8"
       }
     );
     const downloadUrl = URL.createObjectURL(blob);
+    const paragraphs = committed
+      .reduce((a, e, i) => (e === "<NEWPARAGRAPH>" ? [...a, i] : a), [0])
+      .map((newParagraphIndex, index, arrayOfIndexes) => {
+        if (newParagraphIndex === arrayOfIndexes.length - 1) {
+          return committed.slice(newParagraphIndex);
+        } else {
+          console.log("start", newParagraphIndex);
+          console.log("end", arrayOfIndexes[newParagraphIndex]);
+          return committed.slice(newParagraphIndex, arrayOfIndexes[index + 1]);
+        }
+      })
+      .map(paragraphSubArray => {
+        return paragraphSubArray
+          .filter(s => s !== "<NEWPARAGRAPH>")
+          .join(" ")
+          .trim();
+      });
+    console.log("paragraphs", paragraphs);
+    console.log("committed", committed);
     return (
       <div
         onMouseEnter={() => {
@@ -37,7 +63,9 @@ class BigPicture extends Component {
           cursor: "pointer"
         }}
       >
-        <p style={{ margin: 0 }}>{committed.join(" ")}</p>
+        {paragraphs.map((p, i) => (
+          <p key={i}>{p}</p>
+        ))}
         <div
           download={`tfw-ow-${mmddyyyy()}.txt`}
           onClick={this.props.clearCommitted}
@@ -155,10 +183,17 @@ class OneWay extends Component {
               }}
               onKeyDown={e => {
                 if (e.key === "Enter") {
-                  this.setState({
-                    committed: [...committed, inTheWorks],
-                    inTheWorks: ""
-                  });
+                  const newFragment =
+                    inTheWorks === "" ? "<NEWPARAGRAPH>" : inTheWorks;
+                  if (
+                    committed[committed.length - 1] !== "<NEWPARAGRAPH>" ||
+                    inTheWorks !== ""
+                  ) {
+                    this.setState({
+                      committed: [...committed, newFragment],
+                      inTheWorks: ""
+                    });
+                  }
                 }
               }}
             />
