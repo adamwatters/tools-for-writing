@@ -11,12 +11,9 @@ class BigPicture extends Component {
     const committed = this.props.committed || [];
     const blob = new Blob(
       [
-        [
-          `\n`,
-          ...committed.map(c => {
-            return c === "<NEWPARAGRAPH>" ? `\n\n` : c;
-          })
-        ].join(" ")
+        committed.map(c => {
+          return c === "<NEWPARAGRAPH>" ? `\n` : c;
+        })
       ], // Blob parts.
       {
         type: "text/plain;charset=utf-8"
@@ -66,6 +63,7 @@ class BigPicture extends Component {
         {paragraphs.map((p, i) => (
           <p key={i}>{p}</p>
         ))}
+        <div>{paragraphs.reduce((a, e) => a + e.split(" ").length, 0)}</div>
         <div
           download={`tfw-ow-${mmddyyyy()}.txt`}
           onClick={this.props.clearCommitted}
@@ -165,14 +163,20 @@ class OneWay extends Component {
           <div
             style={{
               width: `80%`,
-              maxWidth: "500px",
+              maxWidth: "900px",
+              height: "80px",
               position: "center",
               margin: "0 auto"
             }}
           >
-            <input
+            <textarea
               style={{
+                height: "50px",
                 width: "100%",
+                fontSize: "16px",
+                fontFamily: "serif",
+                border: "1px solid lightgray",
+                resize: "none",
                 padding: "8px",
                 outlineColor: "lightgreen"
               }}
