@@ -86,6 +86,34 @@ class Pomodoro extends Component {
     );
   }
 
+  renderPausedWall(timerState, unpauseClock) {
+    return (
+      !!timerState.paused && (
+        <div
+          onClick={unpauseClock}
+          style={{
+            position: "absolute",
+            left: 0,
+            bottom: 0,
+            top: 0,
+            right: 0,
+            display: "flex",
+            flexDirection: "row",
+            alignContent: "center",
+            alignItems: "center",
+            color: "white",
+            backgroundColor: "black",
+            opacity: 0.8
+          }}
+        >
+          <div style={{ textAlign: "center", width: "100%" }}>
+            PAUSED (click anywhere to unpause)
+          </div>
+        </div>
+      )
+    );
+  }
+
   render() {
     return (
       <Timer
@@ -93,6 +121,8 @@ class Pomodoro extends Component {
           timerState,
           startClock,
           resetClock,
+          pauseClock,
+          unpauseClock,
           segments,
           breakTimeRemaining
         ) => {
@@ -119,6 +149,28 @@ class Pomodoro extends Component {
               <div
                 onClick={() => {
                   if (
+                    window.confirm(
+                      "Is it an emergency? Do not deviate from the Tomato System lightly"
+                    )
+                  ) {
+                    pauseClock();
+                  }
+                }}
+                style={{
+                  position: "absolute",
+                  right: 0,
+                  bottom: 0,
+                  padding: "10px",
+                  display: "flex",
+                  flexDirection: "row",
+                  opacity: 0.8
+                }}
+              >
+                PAUSE
+              </div>
+              <div
+                onClick={() => {
+                  if (
                     window.confirm("Are you sure you want to reset the timer?")
                   ) {
                     resetClock();
@@ -136,6 +188,7 @@ class Pomodoro extends Component {
                 {this.renderSegments(segments)}
               </div>
               {this.renderBreakWall(breakTimeRemaining)}
+              {this.renderPausedWall(timerState, unpauseClock)}
             </div>
           );
         }}

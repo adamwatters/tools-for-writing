@@ -1,5 +1,7 @@
 import { Component } from "react";
 
+// add api for recording data for each break - eg: words typed
+
 class Timer extends Component {
   constructor() {
     super();
@@ -17,7 +19,8 @@ class Timer extends Component {
       ? JSON.parse(persistedStateString)
       : {
           clock: 1,
-          started: false
+          started: false,
+          pause: false
         };
   }
   setClockInterval() {
@@ -35,6 +38,16 @@ class Timer extends Component {
 
   startClock = () => {
     this.setState({ started: true });
+    this.setClockInterval();
+  };
+
+  pauseClock = () => {
+    clearInterval(this.clockInterval);
+    this.setState({ paused: true });
+  };
+
+  unpauseClock = () => {
+    this.setState({ paused: false });
     this.setClockInterval();
   };
 
@@ -86,6 +99,8 @@ class Timer extends Component {
       this.state,
       this.startClock,
       this.resetClock,
+      this.pauseClock,
+      this.unpauseClock,
       segments,
       breakTimeRemaining
     );
