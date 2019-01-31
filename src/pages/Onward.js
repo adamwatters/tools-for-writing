@@ -9,25 +9,13 @@ class BigPicture extends Component {
   }
   render() {
     const committed = this.props.committed || [];
-    const blob = new Blob(
-      [
-        committed.map(c => {
-          return c === "<NEWPARAGRAPH>" ? `\n` : c;
-        })
-      ], // Blob parts.
-      {
-        type: "text/plain;charset=utf-8"
-      }
-    );
-    const downloadUrl = URL.createObjectURL(blob);
     const paragraphs = committed
+      // initialize accumulator with a zero because the first paragraph should be sliced from 0
       .reduce((a, e, i) => (e === "<NEWPARAGRAPH>" ? [...a, i] : a), [0])
       .map((newParagraphIndex, index, arrayOfIndexes) => {
-        if (newParagraphIndex === arrayOfIndexes.length - 1) {
+        if (newParagraphIndex === committed.length - 1) {
           return committed.slice(newParagraphIndex);
         } else {
-          console.log("start", newParagraphIndex);
-          console.log("end", arrayOfIndexes[newParagraphIndex]);
           return committed.slice(newParagraphIndex, arrayOfIndexes[index + 1]);
         }
       })
@@ -37,8 +25,10 @@ class BigPicture extends Component {
           .join(" ")
           .trim();
       });
-    console.log("paragraphs", paragraphs);
-    console.log("committed", committed);
+    const blob = new Blob([paragraphs.join(`\n`)], {
+      type: "text/plain;charset=utf-8"
+    });
+    const downloadUrl = URL.createObjectURL(blob);
     return (
       <div
         onMouseEnter={() => {
@@ -61,9 +51,24 @@ class BigPicture extends Component {
         }}
       >
         {paragraphs.map((p, i) => (
-          <p key={i}>{p}</p>
+          <p
+            style={{
+              minHeight: "10px",
+              backgroundColor:
+                i === paragraphs.length - 1 ? "rgba(0,0,0,.05)" : "white"
+            }}
+            key={i}
+          >
+            {p}
+          </p>
         ))}
-        <div>{paragraphs.reduce((a, e) => a + e.split(" ").length, 0)}</div>
+        <div>{console.log(paragraphs)}</div>
+        <div>
+          {paragraphs
+            .filter(a => a !== "")
+            // return length, or if 0 return empty string
+            .reduce((a, e) => a + e.split(" ").length, 0) || ""}
+        </div>
         <div
           download={`tfw-ow-${mmddyyyy()}.txt`}
           onClick={this.props.clearCommitted}
@@ -163,22 +168,25 @@ class OneWay extends Component {
           <div
             style={{
               width: `80%`,
-              maxWidth: "900px",
+              maxWidth: "700px",
               height: "80px",
               position: "center",
-              margin: "0 auto"
+              margin: "0 auto",
+              display: "flex",
+              alignContent: "stretch",
+              justifyItems: "stretch"
             }}
           >
             <textarea
               style={{
                 height: "50px",
-                width: "100%",
                 fontSize: "16px",
                 fontFamily: "serif",
                 border: "1px solid lightgray",
                 resize: "none",
                 padding: "8px",
-                outlineColor: "lightgreen"
+                outlineColor: "lightgreen",
+                flex: "1 1 auto"
               }}
               type="text"
               value={inTheWorks}
@@ -186,16 +194,25 @@ class OneWay extends Component {
                 this.setState({ inTheWorks: e.target.value });
               }}
               onKeyDown={e => {
+                const { committed } = this.state;
                 if (e.key === "Enter") {
-                  const newFragment =
-                    inTheWorks === "" ? "<NEWPARAGRAPH>" : inTheWorks;
+                  e.preventDefault();
+                  if (inTheWorks !== "") {
+                    this.setState({
+                      committed: [...committed, inTheWorks],
+                      inTheWorks: ""
+                    });
+                  }
+                }
+                if (e.key === "Tab") {
+                  e.preventDefault();
+                  // do not allow newparagraph in first position or two in a row
                   if (
-                    committed[committed.length - 1] !== "<NEWPARAGRAPH>" ||
-                    inTheWorks !== ""
+                    committed[committed.length - 1] !== "<NEWPARAGRAPH>" &&
+                    committed.length !== 0
                   ) {
                     this.setState({
-                      committed: [...committed, newFragment],
-                      inTheWorks: ""
+                      committed: [...committed, "<NEWPARAGRAPH>"]
                     });
                   }
                 }
